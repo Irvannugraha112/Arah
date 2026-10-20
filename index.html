@@ -109,6 +109,40 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--amber);outlin
 @keyframes nyala{0%{opacity:.45;transform:scale(.9)}40%{transform:scale(1.1)}100%{opacity:1;transform:scale(1);background:var(--pine);color:var(--onpine)}}
 @keyframes sorot{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--amber) 70%,transparent)}100%{box-shadow:0 0 0 22px transparent}}
 @keyframes sukses{0%{transform:scale(1)}25%{transform:scale(1.1) rotate(-2deg)}55%{transform:scale(.97)}100%{transform:none}}
+.fitur{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}
+.fitur li{display:flex;gap:12px;align-items:center;color:var(--mute);animation:naik .6s both}
+.fitur li:nth-child(2){animation-delay:.12s}.fitur li:nth-child(3){animation-delay:.24s}
+.fitur span{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--soft);font-size:1.15rem}
+.tg,.kosong{display:block}
+.kosong{max-width:720px;margin:0 auto}
+@media (max-width:759px){
+main{padding-bottom:112px}
+#app>.tabs{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:6;margin:0;background:var(--card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1.5px solid var(--line);box-shadow:0 12px 32px rgba(0,0,0,.28)}
+#app>.tabs button{padding:12px 6px}
+#toast{bottom:calc(94px + env(safe-area-inset-bottom,0px))}
+.fitur{display:none}
+}
+@media (min-width:760px){main{max-width:780px}}
+@media (min-width:1024px){
+main{max-width:1200px;padding:30px 32px 80px}
+h1{font-size:3.3rem}
+.top{margin-bottom:28px}
+#auth{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center;min-height:66vh}
+.formauth{padding:28px}
+.hero .lead{font-size:1.1rem;max-width:30em}
+#app{display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;align-items:start}
+#app>.tabs{flex-direction:column;position:sticky;top:22px;margin:0;padding:8px;gap:4px}
+#app>.tabs button{text-align:left;padding:13px 16px}
+#app>div{grid-column:2}
+#app>.tabs{grid-column:1;grid-row:1/span 4}
+.tg{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,1fr);grid-template-rows:auto 1fr;grid-template-areas:"t a" "t z";gap:0 30px;align-items:start}
+.ga{grid-area:a}.gt{grid-area:t}.gz{grid-area:z}
+.kosong{padding-top:8px}
+#v-hasil{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+#v-hasil>.grid,#v-hasil>h2,#v-hasil>div:not(.card){grid-column:1/-1}
+#v-akun{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;align-items:start}
+#v-akun>.btn{grid-column:1/-1}
+}
 @media (prefers-reduced-motion:reduce){.bg,.bg *,main,main *,.cf{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -127,13 +161,16 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--amber);outlin
 <div id="galat" class="msg bad hide" role="alert"></div>
 
 <section id="auth">
-<h1>Sebut satu tujuan. Agen mengurus sisanya.</h1>
+<div class="hero"><h1>Sebut satu tujuan. Agen mengurus sisanya.</h1>
 <p class="lead">Masuk atau daftar. Rencana, draf tugas, dan progres Anda tersimpan rapi.</p>
+<ul class="fitur"><li><span>🧭</span>Rencana langkah otomatis dari satu tujuan</li><li><span>✍️</span>Draf CV, surat, dan jadwal siap pakai</li><li><span>📈</span>Progres terlacak dan bisa dibagikan</li></ul></div>
+<div class="formauth card">
 <div class="tabs" role="tablist"><button id="tmasuk" aria-selected="true">Masuk</button><button id="tdaftar" aria-selected="false">Daftar</button></div>
 <input id="em" type="email" placeholder="Email" autocomplete="email" aria-label="Email">
 <input id="pw" type="password" placeholder="Kata sandi (minimal 6 karakter)" autocomplete="current-password" aria-label="Kata sandi">
 <div id="info" class="msg hide"></div>
 <button class="btn" id="kirimauth">Masuk</button>
+</div>
 </section>
 
 <section id="app" class="hide">
@@ -209,9 +246,9 @@ document.querySelectorAll("#app .tabs button").forEach(function(b){b.setAttribut
 if(tab==="tujuan")vTujuan();else if(tab==="hasil")vHasil();else vAkun()}
 function salinTeks(x,ok){try{navigator.clipboard.writeText(x).then(function(){toast(ok)},function(){toast("Salin manual dari layar")})}catch(e){toast("Salin manual dari layar")}}
 function vTujuan(){
-var v=$("v-tujuan");v.innerHTML="";var g=aktif();
+var v=$("v-tujuan");v.innerHTML="";v.className="";var g=aktif();
 if(!g){
-v.appendChild(el("h2",null,"Apa tujuan Anda?"));v.appendChild(el("p","lead","Tulis satu tujuan. Agen menyusun langkah-langkahnya."));
+v.className="kosong";v.appendChild(el("h2",null,"Apa tujuan Anda?"));v.appendChild(el("p","lead","Tulis satu tujuan. Agen menyusun langkah-langkahnya."));
 var ch=el("div","chips");
 ["Saya ingin diterima kerja dalam 30 hari","Saya ingin menyelesaikan skripsi semester ini","Saya ingin memulai usaha kecil minggu ini","Saya ingin belajar keahlian baru dalam 8 minggu"].forEach(function(s){var b=el("button","chip",s);b.onclick=function(){ta.value=s;ta.focus()};ch.appendChild(b)});
 v.appendChild(ch);
@@ -222,17 +259,17 @@ b.disabled=true;b.textContent="Menyusun rencana…";
 var tm=el("div","tim");["Agen Perencana","Agen Penulis","Agen Pengingat"].forEach(function(n,i){var x=el("span",null,n);x.style.animationDelay=(i*.8)+"s";tm.appendChild(x)});v.appendChild(tm);
 try{await Promise.all([fn("buat_tujuan",{tujuan:s}),jeda(2600)]);await muat();toast("Rencana siap")}catch(e){galat(e.message);b.disabled=false;b.textContent="Susun rencana saya";tm.remove()}};
 v.appendChild(b);return}
-var c=hitung(g);
-v.appendChild(el("small","small","Tujuan Anda"));v.appendChild(el("h2",null,g.title));
-var bar=el("div","bar"),i=el("i");bar.appendChild(i);v.appendChild(bar);
+var c=hitung(g);v.className="tg";var A=el("div","ga"),T=el("div","gt"),Z=el("div","gz");
+A.appendChild(el("small","small","Tujuan Anda"));A.appendChild(el("h2",null,g.title));
+var bar=el("div","bar"),i=el("i");bar.appendChild(i);A.appendChild(bar);
 setTimeout(function(){i.style.width=c.p+"%"},60);
-v.appendChild(el("div","small",c.p+"% tercapai ("+c.n+" dari "+c.tot+" langkah)"));
+A.appendChild(el("div","small",c.p+"% tercapai ("+c.n+" dari "+c.tot+" langkah)"));
 var nx=g.tasks.filter(function(t){return t.status!=="selesai"})[0];
 if(nx){var k=el("div","card next");k.style.marginTop="14px";k.appendChild(el("small","small","Langkah berikutnya"));k.appendChild(el("h3",null,nx.title));
-var bb=el("button","btn",nx._sibuk?"Menulis…":(nx.draft?"Tandai selesai":"Kerjakan sekarang"));if(nx._sibuk)bb.disabled=true;bb.onclick=function(){nx.draft?centang(g,nx,bb):kerja(g,nx,bb)};k.appendChild(bb);v.appendChild(k)}
-else{var sel=el("div","card next");sel.style.marginTop="14px";sel.appendChild(el("h3",null,"Semua langkah selesai"));sel.appendChild(el("p",null,"Akhiri tujuan ini untuk membuka tujuan baru dan mengumpulkan pencapaian."));v.appendChild(sel)}
+var bb=el("button","btn",nx._sibuk?"Menulis…":(nx.draft?"Tandai selesai":"Kerjakan sekarang"));if(nx._sibuk)bb.disabled=true;bb.onclick=function(){nx.draft?centang(g,nx,bb):kerja(g,nx,bb)};k.appendChild(bb);A.appendChild(k)}
+else{var sel=el("div","card next");sel.style.marginTop="14px";sel.appendChild(el("h3",null,"Semua langkah selesai"));sel.appendChild(el("p",null,"Akhiri tujuan ini untuk membuka tujuan baru dan mengumpulkan pencapaian."));A.appendChild(sel)}
 var f=el("div","card"),fz=el("div","fokus","25:00");fz.id="fz";f.appendChild(fz);
-var fb=el("button","btn ghost sm",timer?"Hentikan fokus":"Mulai fokus 25 menit");fb.style.marginTop="8px";fb.onclick=function(){fokus(fb)};f.appendChild(fb);v.appendChild(f);
+var fb=el("button","btn ghost sm",timer?"Hentikan fokus":"Mulai fokus 25 menit");fb.style.marginTop="8px";fb.onclick=function(){fokus(fb)};f.appendChild(fb);A.appendChild(f);
 g.tasks.forEach(function(t,ix){
 var q=el("div","task"+(t.status==="selesai"?" done":"")+(t._baru?" baru":""));q.style.setProperty("--i",ix);
 var h=el("div","th"),ki=el("div");ki.appendChild(el("span","agent",t.agent));ki.appendChild(el("h3",null,t.title));h.appendChild(ki);
@@ -243,12 +280,12 @@ var a=el("div","acts");
 if(!t.draft){var b1=el("button","btn sm","Kerjakan");b1.onclick=function(){kerja(g,t,b1)};a.appendChild(b1)}
 else{var b3=el("button","btn ghost sm","Salin draf");b3.onclick=function(){salinTeks(isi(t.draft),"Draf disalin")};a.appendChild(b3)}
 var b2=el("button","btn ghost sm",t.status==="selesai"?"Batal selesai":"Tandai selesai");b2.onclick=function(){centang(g,t,b2)};a.appendChild(b2);
-if(!t._sibuk)q.appendChild(a);v.appendChild(q);t._baru=false});
+if(!t._sibuk)q.appendChild(a);T.appendChild(q);t._baru=false});
 var sh=el("div","share");sh.appendChild(el("b",null,"Progres Anda"));
 var tx=c.n+" dari "+c.tot+" langkah selesai untuk tujuan: "+g.title;sh.appendChild(el("div",null,tx));
-var bs=el("button","btn","Bagikan kartu progres");bs.onclick=function(){var s=tx+"\nDipandu agen AI di Arah.";if(navigator.share){navigator.share({text:s}).catch(function(){})}else salinTeks(s,"Kartu progres disalin")};sh.appendChild(bs);v.appendChild(sh);
+var bs=el("button","btn","Bagikan kartu progres");bs.onclick=function(){var s=tx+"\nDipandu agen AI di Arah.";if(navigator.share){navigator.share({text:s}).catch(function(){})}else salinTeks(s,"Kartu progres disalin")};sh.appendChild(bs);Z.appendChild(sh);
 var ak=el("button","btn ghost","Akhiri tujuan ini");
-ak.onclick=async function(){if(!confirm("Akhiri tujuan ini? Anda bisa membuat tujuan baru setelahnya."))return;try{await fn("akhiri_tujuan",{tujuan_id:g.id});await muat();toast("Tujuan diselesaikan")}catch(e){galat(e.message)}};v.appendChild(ak)}
+ak.onclick=async function(){if(!confirm("Akhiri tujuan ini? Anda bisa membuat tujuan baru setelahnya."))return;try{await fn("akhiri_tujuan",{tujuan_id:g.id});await muat();toast("Tujuan diselesaikan")}catch(e){galat(e.message)}};Z.appendChild(ak);v.appendChild(A);v.appendChild(T);v.appendChild(Z)}
 function fokus(b){
 if(timer){clearInterval(timer);timer=null;b.textContent="Mulai fokus 25 menit";$("fz").textContent="25:00";return}
 var s=1500;b.textContent="Hentikan fokus";
