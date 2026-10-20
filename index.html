@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arah — agen AI untuk satu tujuan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#F2F5F3;--card:#fff;--ink:#10231F;--mute:#5B6E68;--pine:#1F5F55;--onpine:#fff;--amber:#F2B134;--line:#D5DED9;--soft:#E6EEEA;--bad:#B3261E;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1614;--card:#15221F;--ink:#E8F0ED;--mute:#93A8A1;--pine:#5CC2B0;--onpine:#06201B;--soft:#1B2B27;--line:#263733;--bad:#F2B8B5}}
+:root[data-theme="dark"]{--bg:#0D1614;--card:#15221F;--ink:#E8F0ED;--mute:#93A8A1;--pine:#5CC2B0;--onpine:#06201B;--soft:#1B2B27;--line:#263733;--bad:#F2B8B5}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Instrument Sans",system-ui,sans-serif}
+main{max-width:560px;margin:0 auto;padding:20px 18px 56px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;margin:0;line-height:1.15}
+h1{font-size:2rem;font-weight:800;letter-spacing:-.02em}h2{font-size:1.2rem;font-weight:800}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;gap:10px}
+.brand{display:flex;align-items:center;gap:8px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.1rem}
+.lead{color:var(--mute);margin:12px 0 20px}
+input,textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:inherit;padding:13px;margin-bottom:10px}
+textarea{min-height:90px;resize:none}
+input:focus,textarea:focus,button:focus-visible,summary:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.btn{width:100%;border:0;border-radius:14px;background:var(--pine);color:var(--onpine);font:600 1rem "Instrument Sans",sans-serif;padding:14px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.sm{width:auto;padding:8px 14px;font-size:.88rem;border-radius:10px}
+.btn.ghost{background:transparent;color:var(--pine);border:1.5px solid var(--line)}
+.tabs{display:flex;gap:8px;margin-bottom:14px}.tabs .btn{flex:1}
+.hide{display:none!important}
+.msg{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:.92rem;margin:0 0 12px}
+.msg.bad{color:var(--bad)}
+.badge{font-size:.78rem;font-weight:600;background:var(--soft);color:var(--pine);border-radius:99px;padding:3px 10px}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+.bar i{display:block;height:100%;background:var(--pine);transition:width .5s}
+.small{color:var(--mute);font-size:.85rem}
+.task{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.task.done{border-color:var(--pine)}
+.th{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.agent{display:inline-block;font-size:.76rem;font-weight:600;background:var(--soft);color:var(--pine);border-radius:8px;padding:2px 8px;margin-bottom:6px}
+.task h3{font-size:1rem;font-weight:600;font-family:"Instrument Sans",sans-serif}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.draft{margin-top:12px;background:var(--soft);border-radius:12px;padding:12px;font-size:.92rem;white-space:pre-wrap}
+.share{background:var(--pine);color:var(--onpine);border-radius:18px;padding:18px;margin:20px 0}
+.share b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem}
+.share .btn{background:var(--amber);color:#10231F;margin-top:12px}
+details{margin-top:22px;border:1.5px solid var(--line);border-radius:14px;padding:12px;background:var(--card)}
+summary{cursor:pointer;font-weight:600}
+details textarea{margin-top:10px}
+</style>
+</head>
+<body>
+<main>
+<div class="top">
+<div class="brand"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 4l4 9-4 9-4-9z" fill="#F2B134"/></svg>Arah</div>
+<div><span class="badge hide" id="plan"></span> <button class="btn ghost sm hide" id="keluar">Keluar</button></div>
+</div>
+<div id="galat" class="msg bad hide" role="alert"></div>
+
+<section id="auth">
+<h1>Sebut satu tujuan. Agen mengurus sisanya.</h1>
+<p class="lead">Masuk atau daftar untuk mulai. Tiga agen menyusun rencana dan menulis draf tugas Anda.</p>
+<div class="tabs"><button class="btn" id="tmasuk">Masuk</button><button class="btn ghost" id="tdaftar">Daftar</button></div>
+<input id="em" type="email" placeholder="Email" autocomplete="email" aria-label="Email">
+<input id="pw" type="password" placeholder="Kata sandi (minimal 6 karakter)" autocomplete="current-password" aria-label="Kata sandi">
+<div id="info" class="msg hide"></div>
+<button class="btn" id="kirimauth">Masuk</button>
+</section>
+
+<section id="app" class="hide">
+<div id="kosong" class="hide">
+<h2>Apa tujuan Anda?</h2>
+<p class="lead">Tulis satu tujuan. Agen menyusun langkah-langkahnya.</p>
+<textarea id="tj" maxlength="300" placeholder="Contoh: Saya ingin diterima kerja sebagai admin dalam 30 hari" aria-label="Tujuan Anda"></textarea>
+<button class="btn" id="susun">Susun rencana saya</button>
+</div>
+
+<div id="isi" class="hide">
+<small class="small">Tujuan Anda</small>
+<h2 id="judul"></h2>
+<div class="bar" aria-hidden="true"><i id="isibar" style="width:0"></i></div>
+<div class="small" id="pct"></div>
+<div id="tugas" style="margin-top:16px"></div>
+<div class="share"><b id="stjudul">Progres Anda</b><div id="sttks" style="margin-top:4px"></div><button class="btn" id="salin">Salin kartu progres untuk dibagikan</button></div>
+<button class="btn ghost" id="akhiri">Akhiri tujuan ini</button>
+</div>
+
+<details>
+<summary>Ada pertanyaan atau masalah?</summary>
+<textarea id="tq" maxlength="1000" placeholder="Tulis pertanyaan Anda" aria-label="Pertanyaan"></textarea>
+<button class="btn sm" id="kirimtq">Kirim</button>
+</details>
+</section>
+</main>
+<script>
+var U="https://pbqrsvvuxyrtgoevdlka.supabase.co",K="sb_publishable_09-I1XKMyvRr5SCkCFwhqw_b9vmZZDo";
+var S=null,mode="masuk",tujuan=null,plan="gratis";
+try{S=JSON.parse(localStorage.getItem("arah_sesi")||"null")}catch(e){}
+function $(i){return document.getElementById(i)}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function simpan(s){S=s;try{if(s)localStorage.setItem("arah_sesi",JSON.stringify(s));else localStorage.removeItem("arah_sesi")}catch(e){}}
+function sesi(d){simpan({a:d.access_token,r:d.refresh_token,exp:Date.now()+((d.expires_in||3600)-60)*1000})}
+function galat(m){var g=$("galat");if(!m){g.classList.add("hide");return}g.textContent=m;g.classList.remove("hide");window.scrollTo(0,0)}
+async function token(){
+if(!S)throw new Error("Silakan masuk dulu.");
+if(Date.now()>S.exp){
+var r=await fetch(U+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:K,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:S.r})});
+var d=await r.json().catch(function(){return{}});
+if(!r.ok){simpan(null);tampil();throw new Error("Sesi berakhir. Silakan masuk lagi.")}
+sesi(d)}
+return S.a}
+async function rest(p){
+var t=await token();
+var r=await fetch(U+"/rest/v1/"+p,{headers:{apikey:K,Authorization:"Bearer "+t}});
+if(!r.ok)throw new Error("Data belum bisa dimuat. Coba lagi.");
+return r.json()}
+async function fn(aksi,b){
+var t=await token();
+var r=await fetch(U+"/functions/v1/arah-agen",{method:"POST",headers:{apikey:K,Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify(Object.assign({aksi:aksi},b||{}))});
+var d=await r.json().catch(function(){return{}});
+if(!r.ok)throw new Error(d.galat||"Terjadi masalah. Coba lagi.");
+return d}
+function info(m){var i=$("info");if(!m){i.classList.add("hide");return}i.textContent=m;i.classList.remove("hide")}
+function setMode(m){mode=m;$("tmasuk").className="btn"+(m==="masuk"?"":" ghost");$("tdaftar").className="btn"+(m==="daftar"?"":" ghost");$("kirimauth").textContent=m==="masuk"?"Masuk":"Daftar";info("")}
+$("tmasuk").onclick=function(){setMode("masuk")};
+$("tdaftar").onclick=function(){setMode("daftar")};
+$("kirimauth").onclick=async function(){
+galat("");info("");
+var e=$("em").value.trim(),p=$("pw").value;
+if(!e||p.length<6){info("Isi email dan kata sandi (minimal 6 karakter).");return}
+var b=$("kirimauth");b.disabled=true;
+try{
+var r=await fetch(U+"/auth/v1/"+(mode==="daftar"?"signup":"token?grant_type=password"),{method:"POST",headers:{apikey:K,"Content-Type":"application/json"},body:JSON.stringify({email:e,password:p})});
+var d=await r.json().catch(function(){return{}});
+if(!r.ok){info(d.msg||d.error_description||d.message||"Gagal. Periksa email dan kata sandi.");return}
+if(d.access_token){sesi(d);tampil()}else info("Pendaftaran berhasil. Cek email Anda untuk konfirmasi, lalu masuk.")
+}catch(x){info("Koneksi bermasalah. Coba lagi.")}finally{b.disabled=false}};
+$("keluar").onclick=function(){simpan(null);tujuan=null;tampil()};
+function tampil(){
+var masuk=!!S;
+$("auth").classList.toggle("hide",masuk);$("app").classList.toggle("hide",!masuk);
+$("keluar").classList.toggle("hide",!masuk);$("plan").classList.toggle("hide",!masuk);
+if(masuk)muat()}
+async function muat(){
+try{
+galat("");
+var pr=await rest("profiles?select=plan");plan=pr[0]?pr[0].plan:"gratis";
+$("plan").textContent=plan==="pro"?"Pro":"Gratis";
+var g=await rest("goals?status=eq.aktif&select=id,title,tasks(id,title,agent,status,draft,position)&order=created_at.desc&limit=1");
+tujuan=g[0]||null;
+if(tujuan)tujuan.tasks.sort(function(a,b){return a.position-b.position});
+gambar()
+}catch(e){galat(e.message)}}
+function gambar(){
+$("kosong").classList.toggle("hide",!!tujuan);$("isi").classList.toggle("hide",!tujuan);
+if(!tujuan)return;
+$("judul").textContent=tujuan.title;
+var n=tujuan.tasks.filter(function(t){return t.status==="selesai"}).length,tot=tujuan.tasks.length,p=tot?Math.round(n/tot*100):0;
+$("isibar").style.width=p+"%";$("pct").textContent=p+"% tercapai ("+n+" dari "+tot+" langkah)";
+$("sttks").textContent=n+" dari "+tot+" langkah selesai untuk tujuan: "+tujuan.title;
+var box=$("tugas");box.innerHTML="";
+tujuan.tasks.forEach(function(t){
+var k=el("div","task"+(t.status==="selesai"?" done":""));
+var h=el("div","th"),kiri=el("div");
+kiri.appendChild(el("span","agent",t.agent));kiri.appendChild(el("h3",null,t.title));h.appendChild(kiri);
+if(t.status==="selesai")h.appendChild(el("span","badge","Selesai"));
+k.appendChild(h);
+if(t.draft)k.appendChild(el("div","draft",t.draft));
+var a=el("div","acts");
+if(!t.draft){
+var b1=el("button","btn sm","Kerjakan");
+b1.onclick=function(){kerja(t,b1)};a.appendChild(b1)}
+var b2=el("button","btn ghost sm",t.status==="selesai"?"Batal selesai":"Tandai selesai");
+b2.onclick=function(){centang(t,b2)};a.appendChild(b2);
+k.appendChild(a);box.appendChild(k)})}
+async function kerja(t,b){
+galat("");b.disabled=true;b.textContent="Menulis…";
+try{var d=await fn("kerjakan",{tugas_id:t.id});t.draft=d.draft;t.status="selesai";gambar()}
+catch(e){galat(e.message);b.disabled=false;b.textContent="Kerjakan"}}
+async function centang(t,b){
+galat("");b.disabled=true;
+try{var s=t.status!=="selesai";await fn("tandai",{tugas_id:t.id,selesai:s});t.status=s?"selesai":"belum";gambar()}
+catch(e){galat(e.message);b.disabled=false}}
+$("susun").onclick=async function(){
+galat("");
+var v=$("tj").value.trim();
+if(v.length<5){galat("Tuliskan tujuan Anda dengan lebih jelas.");return}
+var b=$("susun");b.disabled=true;b.textContent="Menyusun rencana…";
+try{await fn("buat_tujuan",{tujuan:v});$("tj").value="";await muat()}
+catch(e){galat(e.message)}finally{b.disabled=false;b.textContent="Susun rencana saya"}};
+$("akhiri").onclick=async function(){
+if(!tujuan||!confirm("Akhiri tujuan ini? Anda bisa membuat tujuan baru setelahnya."))return;
+try{await fn("akhiri_tujuan",{tujuan_id:tujuan.id});tujuan=null;await muat()}catch(e){galat(e.message)}};
+$("salin").onclick=function(){
+var txt=$("sttks").textContent+"\nDipandu agen AI di Arah.";
+try{navigator.clipboard.writeText(txt).then(function(){$("salin").textContent="Tersalin"},function(){$("salin").textContent="Salin manual dari kartu"})}catch(e){$("salin").textContent="Salin manual dari kartu"}};
+$("kirimtq").onclick=async function(){
+galat("");
+var v=$("tq").value.trim(),b=$("kirimtq");
+if(v.length<5){galat("Tulis pertanyaan Anda dengan lebih lengkap.");return}
+b.disabled=true;
+try{await fn("tanya",{teks:v});$("tq").value="";b.textContent="Terkirim";setTimeout(function(){b.textContent="Kirim"},2500)}
+catch(e){galat(e.message)}finally{b.disabled=false}};
+tampil();
+</script>
+</body>
+</html>
